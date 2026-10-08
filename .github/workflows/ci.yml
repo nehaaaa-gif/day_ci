@@ -1,30 +1,40 @@
 name: React CI
 
 on:
-push:
-branches:
-- main
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
-pull_request:
-branches:
-- main
+# Cancel in-progress runs for the same PR/branch when new commits are pushed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-build:
-runs-on: ubuntu-latest
+  build-and-test:
+    runs-on: ubuntu-latest
 
-steps:
-- name: Checkout Code
-uses: actions/checkout@v4
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-- name: Setup Node.js
-uses: actions/setup-node@v4
-with:
-node-version: 22
-cache: npm
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
 
-- name: Install Dependencies
-run: npm ci
+      - name: Install Dependencies
+        run: npm ci
 
-- name: Build React Application
-run: npm run build
+      - name: Check Code Style & Linting
+        run: npm run lint --if-present
+
+      - name: Run Tests
+        run: npm test -- --watchAll=false --passWithNoTests
+
+      - name: Build React Application
+        run: npm run build
