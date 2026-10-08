@@ -22,7 +22,7 @@ function App() {
           <span className="badge">● CI Pipeline Active</span>
 
           <h1>
-            Build. Test.
+            Build. Test. CI/CD Project
             <br />
             <span>Deploy.</span>
           </h1>
